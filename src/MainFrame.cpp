@@ -2,7 +2,11 @@
 #include <wx/sizer.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
+#ifdef USE_SINGLE_HEADER_JSON
+#include <json.hpp>
+#else
 #include <nlohmann/json.hpp>
+#endif
 #include <fstream>
 #include <sstream>
 #include <iomanip>
