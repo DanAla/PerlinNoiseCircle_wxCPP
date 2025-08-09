@@ -18,6 +18,14 @@ PerlinNoiseCircle_wxCPP generates mesmerizing, organic ring patterns using 2-D P
 
 ---
 
+## 📸 Screenshot
+
+![PerlinNoiseCircle_wxCPP Application](Screenshot.png)
+
+*The application interface showing the parameter controls on the left and the generated Perlin noise circle pattern on the right.*
+
+---
+
 ## 🚀 Building
 
 ### Prerequisites
@@ -57,14 +65,6 @@ mkdir build && cd build
 cmake ..
 make -j$(sysctl -n hw.ncpu)
 ```
-
----
-
-## 📸 Screenshot
-
-![PerlinNoiseCircle_wxCPP Application](Screenshot.png)
-
-*The application interface showing the parameter controls on the left and the generated Perlin noise circle pattern on the right.*
 
 ---
 
