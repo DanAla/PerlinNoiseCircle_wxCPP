@@ -17,6 +17,7 @@ ParamPanel::ParamPanel(wxWindow* parent, std::function<void(const NoiseParams&)>
 }
 
 void ParamPanel::CreateControls() {
+    // Create a 2-column grid sizer: labels, controls (matching Python: cols=2, vgap=4, hgap=8)
     auto* grid = new wxFlexGridSizer(2, 4, 8);
     
     // Structure to define all parameters
@@ -41,9 +42,12 @@ void ParamPanel::CreateControls() {
     };
     
     for (const auto& param : params) {
+        // Create label with 80px width + right alignment style
         auto* label = new wxStaticText(this, wxID_ANY, param.label);
-        label->SetMinSize(wxSize(140, -1));
+        label->SetMinSize(wxSize(80, -1)); // 80px width as requested
+        label->SetWindowStyle(wxALIGN_RIGHT); // KEY: Set right alignment on the label itself!
         
+        // Create control
         if (param.isFloat) {
             auto* ctrl = new wxSpinCtrlDouble(this, param.eventId, wxEmptyString,
                                             wxDefaultPosition, wxDefaultSize,
@@ -59,13 +63,18 @@ void ParamPanel::CreateControls() {
             intCtrls[param.label] = ctrl;
         }
         
+        // Add label (right-aligned in cell with 4px right margin, like Python)
         grid->Add(label, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxRIGHT, 4);
+        
+        // Add control (expand in cell, like Python: sc, 1, wx.EXPAND)
         auto* ctrl = param.isFloat ? static_cast<wxWindow*>(doubleCtrls[param.label]) 
                                    : static_cast<wxWindow*>(intCtrls[param.label]);
-        grid->Add(ctrl, 1, wxEXPAND);
+        grid->Add(ctrl, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
     }
     
+    // Make the control column growable (like Python: grid.AddGrowableCol(1, 1))
     grid->AddGrowableCol(1, 1);
+    
     SetSizer(grid);
 }
 

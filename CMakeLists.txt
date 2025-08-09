@@ -47,6 +47,11 @@ set(HEADERS
     include/Constants.h
 )
 
+# Windows resource file for manifest and version info
+if(WIN32)
+    set(RESOURCE_FILES src/app.rc)
+endif()
+
 # Include directories
 include_directories(include)
 
@@ -57,7 +62,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/external/json.hpp")
 endif()
 
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCE_FILES})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
