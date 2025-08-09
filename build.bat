@@ -68,20 +68,10 @@ if exist PerlinNoiseCircle_wxCPP.exe (
     for %%f in (PerlinNoiseCircle_wxCPP.exe) do echo   %%~zf bytes
     echo.
     
-    :: Ask user if they want to run the program
-    set /p choice="Do you want to run the program now? (Y/n): "
-    if /i "!choice!"=="" set choice=Y
-    if /i "!choice!"=="Y" (
-        echo.
-        echo Starting PerlinNoiseCircle...
-        start PerlinNoiseCircle_wxCPP.exe
-        echo Program launched!
-    ) else (
-        echo.
-        echo You can run the program later with:
-        echo   cd build-mingw
-        echo   PerlinNoiseCircle_wxCPP.exe
-    )
+    :: Automatically run the program after successful build
+    echo Starting PerlinNoiseCircle...
+    start PerlinNoiseCircle_wxCPP.exe
+    echo Program launched!
 ) else (
     echo ERROR: Executable not found after build
     cd ..
@@ -92,4 +82,3 @@ if exist PerlinNoiseCircle_wxCPP.exe (
 cd ..
 echo.
 echo Build script completed.
-pause

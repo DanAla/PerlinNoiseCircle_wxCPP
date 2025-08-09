@@ -128,7 +128,7 @@ void ParamPanel::OnSpinDoubleChanged(wxSpinDoubleEvent& event) {
 
 void ParamPanel::StartRegenTimer() {
     timer->Stop();
-    timer->StartOnce(300);
+    timer->StartOnce(50); // Reduced from 300ms - C++ performance allows much faster updates
 }
 
 void ParamPanel::OnTimer(wxTimerEvent& event) {
