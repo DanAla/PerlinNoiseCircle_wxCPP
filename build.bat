@@ -1,10 +1,10 @@
 @echo off
-REM PerlinNoiseCircle_wxCPP Build Script
+REM wxWidgets DefaultApp Build Script
 
 set MINGW_ROOT=C:\mingw64-standalone\mingw64
 set WXWIDGETS_ROOT=C:\wxWidgets-3.3.1
 set WXWIDGETS_BUILD=%WXWIDGETS_ROOT%\build-mingw
-set APP_NAME=PerlinNoiseCircle_wxCPP
+set APP_NAME=DefaultApp
 
 if "%1"=="help" goto :help
 if "%1"=="kill" goto :kill

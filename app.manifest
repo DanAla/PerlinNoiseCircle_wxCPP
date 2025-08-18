@@ -3,10 +3,10 @@
   <assemblyIdentity
     version="1.0.0.0"
     processorArchitecture="amd64"
-    name="PerlinNoiseCircle_wxCPP"
+    name="DefaultApp"
     type="win32"
   />
-  <description>PerlinNoiseCircle wxWidgets Application</description>
+  <description>wxWidgets Default Application Template</description>
   <dependency>
     <dependentAssembly>
       <assemblyIdentity

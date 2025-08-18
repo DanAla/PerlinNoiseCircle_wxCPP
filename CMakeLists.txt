@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(PerlinNoiseCircle_wxCPP VERSION 1.0.0)
+project(DefaultApp VERSION 1.0.0)
 
 # Enable resource compilation for Windows
 if(WIN32)
@@ -36,9 +36,6 @@ add_definitions(-D__WXMSW__ -DwxUSE_UNICODE=1)
 set(SOURCES
     src/main.cpp
     src/MainFrame.cpp
-    src/Canvas.cpp
-    src/ParamPanel.cpp
-    src/PerlinNoise.cpp
 )
 
 # Windows resource file
@@ -48,20 +45,10 @@ endif()
 
 set(HEADERS
     include/MainFrame.h
-    include/Canvas.h
-    include/ParamPanel.h
-    include/PerlinNoise.h
-    include/Constants.h
 )
 
 # Include directories
 include_directories(include)
-
-# Add external directory for single-header libraries
-if(EXISTS "${CMAKE_SOURCE_DIR}/external/json.hpp")
-    include_directories(external)
-    add_definitions(-DUSE_SINGLE_HEADER_JSON)
-endif()
 
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -76,11 +63,6 @@ if(WIN32)
         oleaut32 uuid rpcrt4 advapi32 wsock32 wininet gdiplus msimg32
         uxtheme dwmapi shlwapi version oleacc
     )
-endif()
-
-# Copy default files to build directory
-if(EXISTS "${CMAKE_SOURCE_DIR}/default_params.json")
-    configure_file(default_params.json ${CMAKE_CURRENT_BINARY_DIR}/default_params.json COPYONLY)
 endif()
 
 # Windows specific settings
