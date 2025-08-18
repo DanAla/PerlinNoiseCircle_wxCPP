@@ -1,34 +1,36 @@
 cmake_minimum_required(VERSION 3.16)
 project(PerlinNoiseCircle_wxCPP VERSION 1.0.0)
 
+# Enable resource compilation for Windows
+if(WIN32)
+    enable_language(RC)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find wxWidgets - point to our specific build
+# Manual wxWidgets configuration for MinGW
 set(wxWidgets_ROOT_DIR "C:/wxWidgets-3.3.1")
 set(wxWidgets_LIB_DIR "C:/wxWidgets-3.3.1/build-mingw/lib/gcc_x64_lib")
-set(wxWidgets_CONFIGURATION mswu)
-find_package(wxWidgets REQUIRED COMPONENTS core base)
+set(wxWidgets_INCLUDE_DIR "${wxWidgets_ROOT_DIR}/include" "${wxWidgets_LIB_DIR}/mswu")
 
-# Manually set wxWidgets libraries and includes for MinGW
-set(wxWidgets_LIBRARIES 
-    "${wxWidgets_LIB_DIR}/libwxmsw33u_core.a"
-    "${wxWidgets_LIB_DIR}/libwxbase33u.a"
-    "${wxWidgets_LIB_DIR}/libwxpng.a"
-    "${wxWidgets_LIB_DIR}/libwxzlib.a"
-    "${wxWidgets_LIB_DIR}/libwxregexu.a"
-    "${wxWidgets_LIB_DIR}/libwxexpat.a"
-    winmm comctl32 uuid oleacc uxtheme rpcrt4 shlwapi version wsock32
-    gdi32 gdiplus msimg32
+# wxWidgets libraries
+set(wxWidgets_LIBRARIES
+    ${wxWidgets_LIB_DIR}/libwxmsw33u_core.a
+    ${wxWidgets_LIB_DIR}/libwxbase33u.a
+    ${wxWidgets_LIB_DIR}/libwxpng.a
+    ${wxWidgets_LIB_DIR}/libwxtiff.a
+    ${wxWidgets_LIB_DIR}/libwxjpeg.a
+    ${wxWidgets_LIB_DIR}/libwxzlib.a
+    ${wxWidgets_LIB_DIR}/libwxregexu.a
+    ${wxWidgets_LIB_DIR}/libwxexpat.a
 )
-set(wxWidgets_INCLUDE_DIRS 
-    "C:/wxWidgets-3.3.1/include"
-    "C:/wxWidgets-3.3.1/build-mingw/lib/gcc_x64_lib/mswu"
-)
-set(wxWidgets_DEFINITIONS -D__WXMSW__)
 
-include_directories(${wxWidgets_INCLUDE_DIRS})
-add_definitions(${wxWidgets_DEFINITIONS})
+# Add wxWidgets include directories
+include_directories(${wxWidgets_INCLUDE_DIR})
+
+# Add wxWidgets definitions
+add_definitions(-D__WXMSW__ -DwxUSE_UNICODE=1)
 
 # Source files
 set(SOURCES
@@ -39,6 +41,11 @@ set(SOURCES
     src/PerlinNoise.cpp
 )
 
+# Windows resource file
+if(WIN32)
+    set(SOURCES ${SOURCES} app.rc)
+endif()
+
 set(HEADERS
     include/MainFrame.h
     include/Canvas.h
@@ -46,11 +53,6 @@ set(HEADERS
     include/PerlinNoise.h
     include/Constants.h
 )
-
-# Windows resource file for manifest and version info
-if(WIN32)
-    set(RESOURCE_FILES src/app.rc)
-endif()
 
 # Include directories
 include_directories(include)
@@ -62,10 +64,19 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/external/json.hpp")
 endif()
 
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCE_FILES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
+
+# Link Windows system libraries required by wxWidgets
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME}
+        kernel32 user32 gdi32 comdlg32 winspool winmm shell32 comctl32 ole32
+        oleaut32 uuid rpcrt4 advapi32 wsock32 wininet gdiplus msimg32
+        uxtheme dwmapi shlwapi version oleacc
+    )
+endif()
 
 # Copy default files to build directory
 if(EXISTS "${CMAKE_SOURCE_DIR}/default_params.json")

@@ -2,16 +2,19 @@
 #include <wx/sizer.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+
+#if defined(USE_SINGLE_HEADER_JSON) || defined(USE_JSON)
 #ifdef USE_SINGLE_HEADER_JSON
 #include <json.hpp>
 #else
 #include <nlohmann/json.hpp>
 #endif
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-
 using json = nlohmann::json;
+#define JSON_SUPPORT_ENABLED
+#endif
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_CLOSE(MainFrame::OnClose)

@@ -1,84 +1,100 @@
 @echo off
-setlocal EnableDelayedExpansion
+REM PerlinNoiseCircle_wxCPP Build Script
 
-echo ==================================================
-echo   PerlinNoiseCircle wxWidgets C++ Build Script
-echo ==================================================
-echo.
+set MINGW_ROOT=C:\mingw64-standalone\mingw64
+set WXWIDGETS_ROOT=C:\wxWidgets-3.3.1
+set WXWIDGETS_BUILD=%WXWIDGETS_ROOT%\build-mingw
+set APP_NAME=PerlinNoiseCircle_wxCPP
 
-:: Check if MinGW is available
-where mingw32-make >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ERROR: mingw32-make not found in PATH
-    echo Please ensure MinGW is installed and in your PATH
-    pause
+if "%1"=="help" goto :help
+if "%1"=="kill" goto :kill
+if "%1"=="start" goto :start
+if "%1"=="run" goto :run
+goto :build
+
+:help
+echo Usage: build.bat [command]
+echo Commands:
+echo   (none)  - Build the project
+echo   clean   - Clean and build
+echo   kill    - Kill running app
+echo   start   - Build and run app
+echo   run     - Run existing app
+echo   help    - Show this help
+exit /b 0
+
+:kill
+echo Killing %APP_NAME%...
+taskkill /f /im %APP_NAME%.exe >nul 2>&1
+if "%2"=="" exit /b 0
+shift
+goto :%2
+
+:start
+call :kill silent
+call :build %2
+if %ERRORLEVEL% equ 0 call :run
+exit /b %ERRORLEVEL%
+
+:run
+if not exist "build_mingw\%APP_NAME%.exe" (
+    echo [ERROR] Executable not found. Build first.
+    exit /b 1
+)
+echo Starting %APP_NAME%...
+start "" "build_mingw\%APP_NAME%.exe"
+exit /b 0
+
+:build
+if not exist "%MINGW_ROOT%\bin\gcc.exe" (
+    echo [ERROR] MinGW not found at %MINGW_ROOT%
     exit /b 1
 )
 
-:: Check if CMake is available  
-where cmake >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ERROR: cmake not found in PATH
-    echo Please ensure CMake is installed and in your PATH
-    pause
+if not exist "%WXWIDGETS_BUILD%\lib\gcc_x64_lib" (
+    echo [ERROR] wxWidgets not found at %WXWIDGETS_BUILD%
     exit /b 1
 )
 
-echo Tools check: OK
-echo.
+set PATH=%MINGW_ROOT%\bin;%PATH%
 
-:: Create build directory if it doesn't exist
-if not exist build-mingw (
-    echo Creating build directory...
-    mkdir build-mingw
+if "%1"=="clean" (
+    echo Cleaning...
+    if exist build_mingw rmdir /s /q build_mingw
 )
 
-:: Enter build directory
-cd build-mingw
+if not exist build_mingw mkdir build_mingw
+cd build_mingw
 
-echo Configuring project with CMake...
-cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
-if %errorlevel% neq 0 (
-    echo ERROR: CMake configuration failed
+echo Configuring...
+cmake -G "MinGW Makefiles" ^
+    -DCMAKE_BUILD_TYPE=Release ^
+    -DCMAKE_C_COMPILER="%MINGW_ROOT%\bin\gcc.exe" ^
+    -DCMAKE_CXX_COMPILER="%MINGW_ROOT%\bin\g++.exe" ^
+    -DCMAKE_MAKE_PROGRAM="%MINGW_ROOT%\bin\mingw32-make.exe" ^
+    -S .. -B . >nul
+
+if %ERRORLEVEL% neq 0 (
+    echo [ERROR] Configuration failed
     cd ..
-    pause
     exit /b 1
 )
 
-echo.
-echo Building project...
-mingw32-make -j4
-if %errorlevel% neq 0 (
-    echo ERROR: Build failed
+echo Building...
+%MINGW_ROOT%\bin\mingw32-make.exe -j4 >nul
+
+if %ERRORLEVEL% neq 0 (
+    echo [ERROR] Build failed
     cd ..
-    pause
     exit /b 1
 )
 
-echo.
-echo ==================================================
-echo   Build completed successfully!
-echo ==================================================
-echo.
-echo Executable: build-mingw\PerlinNoiseCircle_wxCPP.exe
-
-:: Check if executable exists
-if exist PerlinNoiseCircle_wxCPP.exe (
-    echo Size: 
-    for %%f in (PerlinNoiseCircle_wxCPP.exe) do echo   %%~zf bytes
-    echo.
-    
-    :: Automatically run the program after successful build
-    echo Starting PerlinNoiseCircle...
-    start PerlinNoiseCircle_wxCPP.exe
-    echo Program launched!
-) else (
-    echo ERROR: Executable not found after build
-    cd ..
-    pause
-    exit /b 1
-)
+REM Copy runtime DLLs
+copy "%MINGW_ROOT%\bin\libgcc_s_seh-1.dll" . >nul 2>&1
+copy "%MINGW_ROOT%\bin\libstdc++-6.dll" . >nul 2>&1
+copy "%MINGW_ROOT%\bin\libwinpthread-1.dll" . >nul 2>&1
+if exist "..\default_params.json" copy "..\default_params.json" . >nul
 
 cd ..
-echo.
-echo Build script completed.
+echo Build complete: build_mingw\%APP_NAME%.exe
+exit /b 0
